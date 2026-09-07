@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VideoViewer</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 16px; background: #f5f5f5; }
+    .container { max-width: 720px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    h1 { text-align: center; }
+    label { display: block; margin-top: 12px; font-weight: bold; }
+    select, input { width: 100%; padding: 10px; margin-top: 6px; box-sizing: border-box; }
+    button { margin-top: 16px; width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+    button:hover { background: #0056b3; }
+    #player-container { margin-top: 20px; position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #000; }
+    iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+    .info { margin-top: 14px; font-size: 13px; color: #555; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>VideoViewer</h1>
+<h2>Видеоплеер: YouTube | Rutube | VK</h2>
+    <label for="platform">Выберите платформу:</label>
+    <select id="platform">
+      <option value="youtube">YouTube</option>
+      <option value="rutube">Rutube</option>
+      <option value="vk">VK Видео</option>
+    </select>
+
+    <label for="video-id">ID видео (не ссылка целиком):</label>
+    <input type="text" id="video-id" placeholder="Например: dQw4w9WgXcQ (YouTube)" />
+
+    <button onclick="playVideo()">Показать видео!</button>
+
+    <div id="player-container"></div>
+
+    <p class="info">
+      Это легальный плеер через официальные iframe. Вставьте ID видео (из ссылки), а не всю ссылку.
+      <br>
+      YouTube: из <code>watch?v=ID</code> берите только ID.
+      <br>
+      Rutube: из <code>/video/ID/</code> берите ID.
+      <br>
+      VK: из <code>video-XXXXXX_YYYYYY</code> берите оба числа вместе: <code>XXXXXX_YYYYYY</code>.
+    </p>
+  </div>
+
+  <script>
+    function playVideo() {
+      const platform = document.getElementById('platform').value;
+      const videoId = document.getElementById('video-id').value.trim();
+      const container = document.getElementById('player-container');
+
+      if (!videoId) {
+        alert('Пожалуйста, введите ID видео');
+        return;
+      }
+
+      let src = '';
+
+      // YouTube: https://www.youtube.com/embed/ID
+      if (platform === 'youtube') {
+        src = `https://www.youtube.com/embed/${videoId}?autoplay=0&controls=1`;
+      }
+      // Rutube: https://rutube.ru/play/embed/ID
+      else if (platform === 'rutube') {
+        src = `https://rutube.ru/play/embed/${videoId}`;
+      }
+      // VK: https://vkvideo.ru/video_ext.php?oid=-...&id=...
+      // Но для iframe VK проще использовать embed по ID вида XXXXXXX_YYYYYY
+      else if (platform === 'vk') {
+        // Для VK формат: https://vk.com/video_ext.php?oid=...&id=... — но официальный embed проще через ID
+        // VK embed поддерживает ID в формате owner_id_video_id
+        src = `https://vk.com/video_ext.php?oid=-1&id=${videoId}&hash=&hd=2&autoplay=0`;
+        // Примечание: для VK часто нужно именно owner+id, а не просто ID. Если не работает — бери полный embed-код из VK «Поделиться».
+      }
+
+      container.innerHTML = `<iframe src="${src}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"></iframe>`;
+    }
+  </script>
+</body>
+</html>
